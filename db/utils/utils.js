@@ -1,5 +1,13 @@
-exports.formatDates = list => {};
+exports.formatDates = (list, key) => {
+  const objectsDateFormatted = list.map(obj => {
+    return { ...obj };
+  })
+  objectsDateFormatted.forEach((obj) => {
+    obj[key] = new Date(obj[key]);
+  });
+  return objectsDateFormatted;
+};
 
-exports.makeRefObj = list => {};
+exports.makeRefObj = list => { };
 
-exports.formatComments = (comments, articleRef) => {};
+exports.formatComments = (comments, articleRef) => { };
