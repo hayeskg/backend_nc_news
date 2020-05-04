@@ -83,6 +83,100 @@ describe('formatDates', () => {
   })
 });
 
-describe('makeRefObj', () => { });
+describe('makeRefObj', () => {
+  it('Takes an array, a key and a value and returns an reference object', () => {
+    expect(makeRefObj([], 'key', 'value')).toEqual({});
+  });
+  it('Takes an array containing a single object, key and value inputs and returns an the correct reference object', () => {
+    expect(makeRefObj([{ article_id: 1, title: 'A' }], 'article_id', 'title')).toEqual({ 'A': 1 })
+  });
+  it('Works with an input array of multiple objects, returns a larger lookup object', () => {
+    expect(makeRefObj([
+      { article_id: 1, title: 'A' },
+      { article_id: 2, title: 'B' },
+      { article_id: 3, title: 'C' },
+      { article_id: 4, title: 'D' },
+    ], 'article_id', 'title')).toEqual({ 'A': 1, 'B': 2, 'C': 3, 'D': 4 });
+  });
+  it('Does not mutate the original inputs, returns new object', () => {
+    const input = [{ article_id: 1, title: 'A' }];
+    expect(makeRefObj(input)).not.toBe(input);
+    expect(input).toEqual([{ article_id: 1, title: 'A' }]);
+  })
+});
 
-describe('formatComments', () => { });
+describe('formatComments', () => {
+  it('Takes an array of comments and a lookup object, return a formatted array of objects', () => {
+    expect(formatComments([], {}, 'keyToAdd', 'keyToRemove')).toEqual([]);
+  })
+  it('Takes an an array of a single comment object, lookup object and keys to change, return the correctly formatted array of comment object', () => {
+    const input = [{
+      body: 'Nobis consequatur animi. Ullam nobis quaerat voluptates veniam.',
+      belongs_to: 'Making sense of Redux',
+      created_by: 'grumpy19',
+      votes: 7,
+      created_at: 1478813209256,
+    }];
+    const out = [{
+      body: 'Nobis consequatur animi. Ullam nobis quaerat voluptates veniam.',
+      article_id: 4,
+      author: 'grumpy19',
+      votes: 7,
+      created_at: new Date(1478813209256),
+    }];
+    const lookup = { 'Making sense of Redux': 4 };
+    expect(formatComments(input, lookup, 'article_id', 'belongs_to')).toEqual(out);
+  })
+  it('Works for an input array of multiple elements, produces correctly formatted array of comment objects', () => {
+    const input = [{
+      body: 'Nobis consequatur animi. Ullam nobis quaerat voluptates veniam.',
+      belongs_to: 'Making sense of Redux',
+      created_by: 'grumpy19',
+      votes: 7,
+      created_at: 1478813209256,
+    }, {
+      body: 'Dolorem excepturi quaerat. Earum dolor sapiente aut.',
+      belongs_to: '22 Amazing open source React projects',
+      created_by: 'grumpy19',
+      votes: 2,
+      created_at: 1469845535163,
+    }
+    ];
+    const out = [{
+      body: 'Nobis consequatur animi. Ullam nobis quaerat voluptates veniam.',
+      article_id: 4,
+      author: 'grumpy19',
+      votes: 7,
+      created_at: new Date(1478813209256),
+    }, {
+      body: 'Dolorem excepturi quaerat. Earum dolor sapiente aut.',
+      article_id: 3,
+      author: 'grumpy19',
+      votes: 2,
+      created_at: new Date(1469845535163),
+    }];
+    const lookup = { 'Making sense of Redux': 4, '22 Amazing open source React projects': 3 };
+    console.log(formatComments(input, lookup, 'article_id', 'belongs_to'));
+    expect(formatComments(input, lookup, 'article_id', 'belongs_to')).toEqual(out);
+  })
+  it('Does not mutate the original input array and returns a new object', () => {
+    input = [{
+      body: 'Dolorem excepturi quaerat. Earum dolor sapiente aut.',
+      article_id: 3,
+      author: 'grumpy19',
+      votes: 2,
+      created_at: new Date(1469845535163),
+    }];
+    lookup = { '22 Amazing open source React projects': 3 };
+    const out = formatComments(input, lookup, 'article_id', 'belongs_to');
+    expect(out).not.toBe(input);
+    expect(input).toEqual([{
+      body: 'Dolorem excepturi quaerat. Earum dolor sapiente aut.',
+      article_id: 3,
+      author: 'grumpy19',
+      votes: 2,
+      created_at: new Date(1469845535163),
+    }]);
+    expect(lookup).toEqual({ '22 Amazing open source React projects': 3 });
+  })
+});
