@@ -23,6 +23,7 @@ exports.makeRefObj = (list, value, key) => {
 };
 
 exports.formatComments = (comments, articleRef, keyToAdd, keyToRemove) => {
+
   const formattedComments = comments.map(obj => {
     return { ...obj };
   });
