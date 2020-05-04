@@ -6,7 +6,6 @@
   "scripts": {
     "setup-dbs": "psql -f ./db/setup.sql",
     "seed": "knex seed:run",
-    "test-utils": "mocha spec/utils.spec.js",
     "test": "jest --watch"
   },
   "jest": {
