@@ -32,7 +32,6 @@ exports.seed = function (knex) {
     })
     .then(articleRows => {
       const articleLookup = makeRefObj(articleRows, 'article_id', 'title');
-      console.log(articleLookup);
       //   /* 
 
       //   Your comment data is currently in the incorrect format and will violate your SQL schema. 
@@ -42,8 +41,7 @@ exports.seed = function (knex) {
       //   You will need to write and test the provided makeRefObj and formatComments utility functions to be able insert your comment data.
       //   */
 
-      const formattedComments = formatComments(commentData, articleRef, '');
-      console.log(formatComments)
-      //return knex('comments').insert(formattedComments);
+      const formattedComments = formatComments(commentData, articleLookup, 'article_id', 'belongs_to');
+      return knex('comments').insert(formattedComments);
     });
 };
