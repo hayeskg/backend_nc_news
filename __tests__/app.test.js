@@ -50,6 +50,14 @@ describe('app', () => {
               expect(Object.keys(body.user)).toEqual(expect.arrayContaining(['username', 'name', 'avatar_url']));
             });
         });
+        xtest('Status:400 error message when GET request with invalid username', () => {
+          return request(app)
+            .get('/api/users/notValidUsername')
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe('invalid input syntax for integer: "notValidUsername"');
+            })
+        })
       });
     });
     describe('/articles/:article_id', () => {
@@ -80,6 +88,14 @@ describe('app', () => {
               expect(body.article.article_id).toBe(3);
             });
         });
+        xtest('Status:400 error message when GET request with invalid article ID', () => {
+          return request(app)
+            .get('/api/articles/notValidArticleID')
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe('invalid input syntax for integer: "notValidArticleID"');
+            })
+        })
       });
       describe('PATCH method', () => {
         test('Status:200 takes a newVotes object and updates the votes of the given article, returns updated article object', () => {

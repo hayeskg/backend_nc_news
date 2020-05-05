@@ -7,4 +7,5 @@ exports.getUser = (req, res, next) => {
       user: user[0]
     })
   })
+    .catch(next);
 }

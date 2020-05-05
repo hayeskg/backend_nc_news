@@ -1,6 +1,12 @@
 const knex = require('../db/connection');
 
 const fetchArticle = (article_id) => {
+  if (!article_id) {
+    return Promise.reject({
+      status: 404,
+      msg: `No article found for article_id: ${article_id}`,
+    });
+  }
   return knex.select('articles.*')
     .count('comments.article_id as comment_count')
     .from('articles')
@@ -8,6 +14,7 @@ const fetchArticle = (article_id) => {
     .leftJoin('comments', 'articles.article_id', '=', 'comments.article_id')
     .groupBy('articles.article_id')
     .where('articles.article_id', '=', article_id);
+
 }
 
 const updateArticle = (article_id, vote) => {
@@ -23,8 +30,15 @@ const updateArticle = (article_id, vote) => {
         .update({ votes: temp })
         .into('articles')
         .then(() => {
+          if (!article_id) {
+            return Promise.reject({
+              status: 404,
+              msg: `No article found for article_id: ${article_id}`,
+            });
+          }
           return fetchArticle(article_id)
         })
+
     })
 }
 
