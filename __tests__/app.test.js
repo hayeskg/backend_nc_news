@@ -81,6 +81,32 @@ describe('app', () => {
             });
         });
       });
+      describe('PATCH method', () => {
+        test('Status:200 takes a newVotes object and updates the votes of the given article, returns updated article object', () => {
+          const newVote = { inc_votes: 10 };
+          return request(app)
+            .patch('/api/articles/3')
+            .send(newVote)
+            .expect(200)
+            .then(({ body }) => {
+              expect(Object.keys(body.article)).toEqual(expect.arrayContaining(['author', 'title', 'article_id', 'body', 'topic', 'created_at', 'votes', 'comment_count']));
+              expect(body.article.article_id).toBe(3);
+              expect(body.article.votes).toEqual(10);
+            });
+        });
+        test('Status:200 test with another article ID', () => {
+          const newVote = { inc_votes: 20 };
+          return request(app)
+            .patch('/api/articles/1')
+            .send(newVote)
+            .expect(200)
+            .then(({ body }) => {
+              expect(Object.keys(body.article)).toEqual(expect.arrayContaining(['author', 'title', 'article_id', 'body', 'topic', 'created_at', 'votes', 'comment_count']));
+              expect(body.article.article_id).toBe(1);
+              expect(body.article.votes).toEqual(120);
+            });
+        });
+      });
     });
   });
 });
