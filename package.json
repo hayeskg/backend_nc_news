@@ -29,11 +29,13 @@
   },
   "homepage": "https://github.com/northcoders/be-nc-news#readme",
   "dependencies": {
+    "express": "^4.17.1",
     "knex": "^0.21.1",
     "pg": "^8.0.3"
   },
   "devDependencies": {
     "jest": "^25.5.4",
-    "jest-sorted": "^1.0.6"
+    "jest-sorted": "^1.0.6",
+    "supertest": "^4.0.2"
   }
 }
