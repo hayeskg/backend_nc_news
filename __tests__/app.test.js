@@ -52,5 +52,35 @@ describe('app', () => {
         });
       });
     });
+    describe('/articles/:article_id', () => {
+      describe('GET method', () => {
+        test('Status:200 responds with an article object', () => {
+          return request(app)
+            .get('/api/articles/1')
+            .expect(200)
+            .then(({ body }) => {
+              expect(typeof body.article).toBe('object');
+            });
+        });
+        test('Status:200 article object includes properties author, title, article_id, body, topic, created_at, votes, comment_count', () => {
+          return request(app)
+            .get('/api/articles/1')
+            .expect(200)
+            .then(({ body }) => {
+              expect(Object.keys(body.article)).toEqual(expect.arrayContaining(['author', 'title', 'article_id', 'body', 'topic', 'created_at', 'votes', 'comment_count']));
+              expect(body.article.article_id).toBe(1);
+            });
+        });
+        test('Status:200 test for another article ID', () => {
+          return request(app)
+            .get('/api/articles/3')
+            .expect(200)
+            .then(({ body }) => {
+              expect(Object.keys(body.article)).toEqual(expect.arrayContaining(['author', 'title', 'article_id', 'body', 'topic', 'created_at', 'votes', 'comment_count']));
+              expect(body.article.article_id).toBe(3);
+            });
+        });
+      });
+    });
   });
 });
