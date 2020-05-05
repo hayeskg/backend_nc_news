@@ -32,5 +32,25 @@ describe('app', () => {
         })
       });
     });
+    describe('/users/:username', () => {
+      describe('GET method', () => {
+        test('Status:200 responds with the correct user object based on a username parametric endpoint', () => {
+          return request(app)
+            .get('/api/users/rogersop')
+            .expect(200)
+            .then(({ body }) => {
+              expect(typeof body.user).toBe('object');
+            });
+        });
+        test('Status:200 returned user object includes properties username, name and avatar_url', () => {
+          return request(app)
+            .get('/api/users/rogersop')
+            .expect(200)
+            .then(({ body }) => {
+              expect(Object.keys(body.user)).toEqual(expect.arrayContaining(['username', 'name', 'avatar_url']));
+            });
+        });
+      });
+    });
   });
 });
