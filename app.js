@@ -13,7 +13,6 @@ app.use('/api', apiRouter);
 
 app.all('/*', (req, res, next) =>
   res.status(404).send({ msg: 'Route not found' })
-  // next({ status: 404, msg: 'Route not found' })
 );
 
 app.use(handleCustomErrors);

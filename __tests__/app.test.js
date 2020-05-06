@@ -18,6 +18,14 @@ describe('app', () => {
         })
     })
     describe('/topics', () => {
+      test('Status:405 Method not allowed message when method other than GET used', () => {
+        return request(app)
+          .put('/api/topics')
+          .expect(405)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Method not allowed');
+          })
+      })
       describe('GET method', () => {
         test('Status:200 responds with array of topics objects', () => {
           return request(app)
@@ -41,6 +49,14 @@ describe('app', () => {
       });
     });
     describe('/users/:username', () => {
+      test('Status:405 Method not allowed message when method other than GET used', () => {
+        return request(app)
+          .put('/api/users/rogersop')
+          .expect(405)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Method not allowed');
+          })
+      })
       describe('GET method', () => {
         test('Status:200 responds with the correct user object based on a username parametric endpoint', () => {
           return request(app)
@@ -58,14 +74,6 @@ describe('app', () => {
               expect(Object.keys(body.user)).toEqual(expect.arrayContaining(['username', 'name', 'avatar_url']));
             });
         });
-        // xtest('Status:400 Bad Request when incorrect username is passed', () => {
-        //   return request(app)
-        //     .get('/api/users/123') ///technically correct
-        //     .expect(400)
-        //     .then(({ body }) => {
-        //       expect(body.msg).toBe('Bad Request');
-        //     })
-        // })
         test('Status:404 error message when GET request with non-existent username', () => {
           return request(app)
             .get('/api/users/notValidUsername')
@@ -74,17 +82,18 @@ describe('app', () => {
               expect(body.msg).toBe('non-existent username: notValidUsername');
             })
         })
-        test('Status:405 Method not allowed message when method other than GET used', () => {
-          return request(app)
-            .put('/api/users/rogersop') //routing related issue... need help
-            .expect(405)
-            .then(({ body }) => {
-              expect(body.msg).toBe('Method not allowed');
-            })
-        })
+
       });
     });
     describe('/articles/:article_id', () => {
+      test('Status:405 Method not allowed message when method other than GET/PATCH used', () => {
+        return request(app)
+          .del('/api/articles/3')
+          .expect(405)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Method not allowed');
+          })
+      })
       describe('GET method', () => {
         test('Status:200 responds with an article object', () => {
           return request(app)
@@ -112,20 +121,20 @@ describe('app', () => {
               expect(body.article.article_id).toBe(3);
             });
         });
-        test('Status:404 error message when GET request with non-existent username', () => {
+        test('Status:400 Bad Request when invalid article ID is passed', () => {
+          return request(app)
+            .get('/api/articles/hellostring')
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe('Bad Request');
+            })
+        })
+        test('Status:404 error message when GET request with non-existent article number', () => {
           return request(app)
             .get('/api/articles/3333333')
             .expect(404)
             .then(({ body }) => {
               expect(body.msg).toBe('No article found for article_id: 3333333');
-            })
-        })
-        xtest('Status:400 error message when GET request with invalid article ID', () => {
-          return request(app)
-            .get('/api/articles/notValidArticleID')
-            .expect(400)
-            .then(({ body }) => {
-              expect(body.msg).toBe('invalid input syntax for integer: "notValidArticleID"');
             })
         })
       });
@@ -154,7 +163,28 @@ describe('app', () => {
               expect(body.article.votes).toEqual(120);
             });
         });
+        test('Status:400 Bad Request when invalid article ID is passed', () => {
+          const newVote = { inc_votes: 20 };
+          return request(app)
+            .patch('/api/articles/hellostring')
+            .send(newVote)
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe('Bad Request');
+            });
+        })
+        test('Status:404 error message when PATCH request with non-existent article number', () => {
+          const newVote = { inc_votes: 20 };
+          return request(app)
+            .patch('/api/articles/12345')
+            .send(newVote)
+            .expect(404)
+            .then(({ body }) => {
+              expect(body.msg).toBe('No article found for article_id: 12345');
+            });
+        })
       });
     });
   });
 });
+

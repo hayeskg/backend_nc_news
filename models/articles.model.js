@@ -27,23 +27,23 @@ const updateArticle = (article_id, vote) => {
     .from('articles')
     .where('article_id', '=', article_id)
     .then(votes => {
-      const temp = parseInt(votes[0].votes) + vote;
-      return knex
-        .returning("*")
-        .where({ article_id: article_id })
-        .update({ votes: temp })
-        .into('articles')
-        .then(() => {
-          if (!article_id) {
-            return Promise.reject({
-              status: 404,
-              msg: `No article found for article_id: ${article_id}`,
-            });
-          }
-          return fetchArticle(article_id)
-        })
-
-    })
+      if (votes.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: `No article found for article_id: ${article_id}`,
+        });
+      } else {
+        const temp = parseInt(votes[0].votes) + vote;
+        return knex
+          .returning("*")
+          .where({ article_id: article_id })
+          .update({ votes: temp })
+          .into('articles')
+          .then(() => {
+            return fetchArticle(article_id);
+          })
+      }
+    });
 }
 
 module.exports = { fetchArticle, updateArticle }
