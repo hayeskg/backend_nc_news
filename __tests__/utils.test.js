@@ -156,7 +156,6 @@ describe('formatComments', () => {
       created_at: new Date(1469845535163),
     }];
     const lookup = { 'Making sense of Redux': 4, '22 Amazing open source React projects': 3 };
-    console.log(formatComments(input, lookup, 'article_id', 'belongs_to'));
     expect(formatComments(input, lookup, 'article_id', 'belongs_to')).toEqual(out);
   })
   it('Does not mutate the original input array and returns a new object', () => {

@@ -5,6 +5,7 @@ exports.getArticle = (req, res, next) => {
   fetchArticle(article_id).then(article => {
     res.status(200).send({ article: article[0] });
   })
+    .catch(next);
 }
 
 exports.patchArticle = (req, res, next) => {
@@ -13,5 +14,6 @@ exports.patchArticle = (req, res, next) => {
   updateArticle(article_id, inc_votes).then(article => {
     res.status(200).send({ article: article[0] });
   })
+    .next(next);
 
 }

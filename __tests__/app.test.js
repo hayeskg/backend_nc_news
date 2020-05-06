@@ -9,6 +9,14 @@ afterAll(() => { return connection.destroy() });
 
 describe('app', () => {
   describe('/api', () => {
+    test('Status: 404 - Route not found when client tries a GET method on an incorrect path /topics/abc', () => {
+      return request(app)
+        .get('/api/topics/abc')
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Route not found');
+        })
+    })
     describe('/topics', () => {
       describe('GET method', () => {
         test('Status:200 responds with array of topics objects', () => {
@@ -50,12 +58,28 @@ describe('app', () => {
               expect(Object.keys(body.user)).toEqual(expect.arrayContaining(['username', 'name', 'avatar_url']));
             });
         });
-        xtest('Status:400 error message when GET request with invalid username', () => {
+        xtest('Status:400 Bad Request when incorrect username is passed', () => {
           return request(app)
-            .get('/api/users/notValidUsername')
+            .get('/api/users/123') ///what is an incorrect username?
             .expect(400)
             .then(({ body }) => {
-              expect(body.msg).toBe('invalid input syntax for integer: "notValidUsername"');
+              expect(body.msg).toBe('Bad Request');
+            })
+        })
+        test('Status:404 error message when GET request with non-existent username', () => {
+          return request(app)
+            .get('/api/users/notValidUsername')
+            .expect(404)
+            .then(({ body }) => {
+              expect(body.msg).toBe('non-existent username: notValidUsername');
+            })
+        })
+        xtest('Status:405 Method not allowed message when method other than GET used', () => {
+          return request(app)
+            .put('/api/users/rogersop') //routing related issue... need help
+            .expect(405)
+            .then(({ body }) => {
+              expect(body.msg).toBe('Method not allowed');
             })
         })
       });
@@ -88,6 +112,14 @@ describe('app', () => {
               expect(body.article.article_id).toBe(3);
             });
         });
+        test('Status:404 error message when GET request with non-existent username', () => {
+          return request(app)
+            .get('/api/articles/3333333')
+            .expect(404)
+            .then(({ body }) => {
+              expect(body.msg).toBe('No article found for article_id: 3333333');
+            })
+        })
         xtest('Status:400 error message when GET request with invalid article ID', () => {
           return request(app)
             .get('/api/articles/notValidArticleID')
