@@ -1,7 +1,6 @@
 const knex = require('../db/connection');
 
 const fetchArticle = (article_id) => {
-
   return knex.select('articles.*')
     .count('comments.article_id as comment_count')
     .from('articles')
@@ -46,4 +45,22 @@ const updateArticle = (article_id, vote) => {
     });
 }
 
-module.exports = { fetchArticle, updateArticle }
+const fetchCommentsByArticleId = (article_id, sorted_by, order) => {
+  return knex.select('*')
+    .from('comments')
+    .orderBy(sorted_by || 'created_at', order || 'desc')
+    .where('article_id', article_id)
+    .then(comments => {
+      console.log(comments);
+      if (comments.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: `No comments found for article_id: ${article_id}`,
+        });
+      } else {
+        return comments;
+      }
+    })
+}
+
+module.exports = { fetchArticle, updateArticle, fetchCommentsByArticleId }

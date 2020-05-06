@@ -129,7 +129,7 @@ describe('app', () => {
               expect(body.msg).toBe('Bad Request');
             })
         })
-        test('Status:404 error message when GET request with non-existent article number', () => {
+        test('Status:404 error message when non-existent article ID is passed', () => {
           return request(app)
             .get('/api/articles/3333333')
             .expect(404)
@@ -183,7 +183,7 @@ describe('app', () => {
               expect(body.msg).toBe('Bad Request');
             });
         })
-        test('Status:404 error message when PATCH request with non-existent article number', () => {
+        test('Status:404 error message when non-existent article ID is passed', () => {
           const newVote = { inc_votes: 20 };
           return request(app)
             .patch('/api/articles/12345')
@@ -194,7 +194,64 @@ describe('app', () => {
             });
         })
       });
+
     });
+    describe('/articles/:article_id/comments', () => {
+      test('Status:405 Method not allowed message when method other than GET/POST used', () => {
+        return request(app)
+          .put('/api/articles/3/comments')
+          .expect(405)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Method not allowed');
+          })
+      })
+      describe('GET method', () => {
+        test('Status:200 Returns an array of comments for a valid article_id', () => {
+          return request(app)
+            .get('/api/articles/1/comments')
+            .expect(200)
+            .then(({ body }) => {
+              body.comments.forEach((comment) => {
+                expect(Object.keys(comment)).toEqual(expect.arrayContaining(['comment_id', 'votes', 'created_at', 'author', 'body']));
+              })
+              expect(Array.isArray(body.comments)).toBe(true);
+            });
+        })
+        test('Status:200 Accepts a sort_by query for any valid column - defaults to created_at descending', () => {
+          return request(app)
+            .get('/api/articles/1/comments')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.comments).toBeSortedBy('created_at', {
+                descending: true,
+              });
+            });
+        })
+        test('Status:200 Accepts a sort_by query for any valid column - tested with sort_by = author, ascending', () => {
+          return request(app)
+            .get('/api/articles/1/comments?sorted_by=author&order=asc')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.comments).toBeSortedBy('author');
+            });
+        })
+        test('Status:400 Bad Request when invalid article ID is passed', () => {
+          return request(app)
+            .get('/api/articles/hellostring/comments')
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe('Bad Request');
+            })
+        })
+        test('Status:404 error message when non-existent article ID is passed', () => {
+          return request(app)
+            .get('/api/articles/3333333/comments')
+            .expect(404)
+            .then(({ body }) => {
+              expect(body.msg).toBe('No comments found for article_id: 3333333');
+            })
+        })
+      })
+    })
   });
 });
-
