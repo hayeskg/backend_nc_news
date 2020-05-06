@@ -173,6 +173,16 @@ describe('app', () => {
               expect(body.msg).toBe('Bad Request');
             });
         })
+        test('Status:400 Bad Request when incorrect newVote object is passed', () => {
+          const newVote = { blabla: 3 };
+          return request(app)
+            .patch('/api/articles/3')
+            .send(newVote)
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe('Bad Request');
+            });
+        })
         test('Status:404 error message when PATCH request with non-existent article number', () => {
           const newVote = { inc_votes: 20 };
           return request(app)
