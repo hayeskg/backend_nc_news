@@ -58,14 +58,14 @@ describe('app', () => {
               expect(Object.keys(body.user)).toEqual(expect.arrayContaining(['username', 'name', 'avatar_url']));
             });
         });
-        xtest('Status:400 Bad Request when incorrect username is passed', () => {
-          return request(app)
-            .get('/api/users/123') ///what is an incorrect username?
-            .expect(400)
-            .then(({ body }) => {
-              expect(body.msg).toBe('Bad Request');
-            })
-        })
+        // xtest('Status:400 Bad Request when incorrect username is passed', () => {
+        //   return request(app)
+        //     .get('/api/users/123') ///technically correct
+        //     .expect(400)
+        //     .then(({ body }) => {
+        //       expect(body.msg).toBe('Bad Request');
+        //     })
+        // })
         test('Status:404 error message when GET request with non-existent username', () => {
           return request(app)
             .get('/api/users/notValidUsername')
@@ -74,7 +74,7 @@ describe('app', () => {
               expect(body.msg).toBe('non-existent username: notValidUsername');
             })
         })
-        xtest('Status:405 Method not allowed message when method other than GET used', () => {
+        test('Status:405 Method not allowed message when method other than GET used', () => {
           return request(app)
             .put('/api/users/rogersop') //routing related issue... need help
             .expect(405)
