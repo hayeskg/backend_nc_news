@@ -9,15 +9,23 @@ afterAll(() => { return connection.destroy() });
 
 describe('app', () => {
   describe('/api', () => {
-    test('Status: 404 - Route not found when client tries a GET method on an incorrect path /topics/abc', () => {
+    test('Status:404 - Route not found when client tries an incorrect endpoint path', () => {
       return request(app)
-        .get('/api/topics/abc')
+        .get('/api/whatever')
         .expect(404)
         .then(({ body }) => {
           expect(body.msg).toBe('Route not found');
         })
     })
     describe('/topics', () => {
+      test('Status: 404 - Route not found when client tries an incorrect endpoint path', () => {
+        return request(app)
+          .get('/api/topics/whatever')
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Route not found');
+          })
+      })
       test('Status:405 Method not allowed message when method other than GET used', () => {
         return request(app)
           .put('/api/topics')
@@ -330,7 +338,15 @@ describe('app', () => {
         });
       });
     })
-    describe.only('/comments/:comment_id', () => {
+    describe('/comments/:comment_id', () => {
+      test('Status:404 - Route not found when client tries an incorrect endpoint path', () => {
+        return request(app)
+          .get('/api/comments/')
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Route not found');
+          })
+      })
       test('Status:405 Method not allowed message when method other than PATCH/DEL used', () => {
         return request(app)
           .get('/api/comments/3')
@@ -393,7 +409,21 @@ describe('app', () => {
             });
         })
       })
-      describe('DELETE method', () => { })
+      describe('DELETE method', () => {
+        test('Status:204 Delete a comment based on valid comment ID', () => {
+          return request(app)
+            .del('/api/comments/11')
+            .expect(204)
+        })
+        test('Status:404 Comment not found when incorrect comment ID passed', () => {
+          return request(app)
+            .del('/api/comments/99')
+            .expect(404)
+            .then(({ body }) => {
+              expect(body.msg).toBe('Comment not found.');
+            })
+        })
+      })
     })
   })
 

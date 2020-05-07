@@ -5,15 +5,14 @@ const {
   handleCustomErrors,
   handlePsqlErrors,
   handleServerErrors,
+  send404,
 } = require('./errors/index.js');
 
 
 app.use(express.json());
 app.use('/api', apiRouter);
 
-app.all('/*', (req, res, next) =>
-  res.status(404).send({ msg: 'Route not found' })
-);
+app.all('/*', send404);
 
 app.use(handleCustomErrors);
 app.use(handlePsqlErrors);

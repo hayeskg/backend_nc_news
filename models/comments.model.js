@@ -25,4 +25,14 @@ const updateCommentById = (comment_id, vote) => {
     });
 }
 
-module.exports = { updateCommentById }
+const removeCommentById = (comment_id) => {
+  return knex
+    .del()
+    .from('comments')
+    .where('comment_id', comment_id)
+    .then((delCount) => {
+      if (delCount === 0) return Promise.reject({ status: 404, msg: 'Comment not found.' })
+    })
+}
+
+module.exports = { updateCommentById, removeCommentById }

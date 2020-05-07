@@ -19,3 +19,7 @@ exports.handleServerErrors = (err, req, res, next) => {
 exports.handleMethodNotAllowed = (req, res, next) => {
   res.status(405).send({ msg: 'Method not allowed' });
 };
+
+exports.send404 = (req, res, next) => {
+  res.status(404).send({ msg: 'Route not found' })
+};
