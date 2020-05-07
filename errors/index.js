@@ -15,4 +15,6 @@ exports.handleServerErrors = (err, req, res, next) => {
   res.status(500).send({ msg: 'Internal Server Error' });
 };
 
-//
+exports.handleMethodNotAllowed = (req, res, next) => {
+  res.status(405).send({ msg: 'Method not allowed' });
+};

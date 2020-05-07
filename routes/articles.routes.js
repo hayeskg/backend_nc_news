@@ -1,11 +1,11 @@
 const articlesRouter = require('express').Router();
-const { getArticle, patchArticle, getCommentsByArticleId } = require('../controllers/articles.controller');
+const { getArticleByArticleId, patchArticleByArticleId, getCommentsByArticleId, getArticles } = require('../controllers/articles.controller');
+const { handleMethodNotAllowed } = require('../errors/index');
 
-articlesRouter.route('/:article_id').get(getArticle).patch(patchArticle).all((req, res, next) => {
-  res.status(405).send({ msg: 'Method not allowed' });
-});
-articlesRouter.route('/:article_id/comments').get(getCommentsByArticleId).all((req, res, next) => {
-  res.status(405).send({ msg: 'Method not allowed' });
-});
+articlesRouter.route('/').get(getArticles).all(handleMethodNotAllowed);
+
+articlesRouter.route('/:article_id').get(getArticleByArticleId).patch(patchArticleByArticleId).all(handleMethodNotAllowed);
+
+articlesRouter.route('/:article_id/comments').get(getCommentsByArticleId).all(handleMethodNotAllowed);
 
 module.exports = articlesRouter;

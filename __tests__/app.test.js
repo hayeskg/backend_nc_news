@@ -253,5 +253,29 @@ describe('app', () => {
         })
       })
     })
+    describe('/articles', () => {
+      test('Status:405 Method not allowed message when method other than GET used', () => {
+        return request(app)
+          .del('/api/articles')
+          .expect(405)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Method not allowed');
+          })
+      })
+      describe('GET method', () => {
+        test('Status:200 Returns an array of articles', () => {
+          return request(app)
+            .get('/api/articles')
+            .expect(200)
+            .then(({ body }) => {
+              body.articles.forEach((article) => {
+                expect(Object.keys(article)).toEqual(expect.arrayContaining(['author', 'title', 'article_id', 'topic', 'created_at', 'votes', 'comment_count']));
+              })
+              expect(Array.isArray(body.articles)).toBe(true);
+            });
+        })
+      })
+
+    })
   });
 });
