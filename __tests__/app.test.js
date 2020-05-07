@@ -320,15 +320,80 @@ describe('app', () => {
               })
             });
         })
-        test('Status:404 Resource Not Found for invalid queries', () => {
+        test('Status:400 Bad Request for invalid queries', () => {
           return request(app)
             .get('/api/articles?topic=notatopic&order=bla')
-            .expect(404)
+            .expect(400)
             .then(({ body }) => {
-              expect(body.msg).toBe('No articles found to match your query.');
+              expect(body.msg).toBe('Bad Request - invalid query.');
             })
         });
       });
+    })
+    describe.only('/comments/:comment_id', () => {
+      test('Status:405 Method not allowed message when method other than PATCH/DEL used', () => {
+        return request(app)
+          .get('/api/comments/3')
+          .expect(405)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Method not allowed');
+          })
+      })
+      describe('PATCH method', () => {
+        test('Status:200 takes a newVotes object and updates the votes of the given comment, returns updated comment object', () => {
+          const newVote = { inc_votes: 1 };
+          return request(app)
+            .patch('/api/comments/1')
+            .send(newVote)
+            .expect(200)
+            .then(({ body }) => {
+              expect(Object.keys(body.comment)).toEqual(expect.arrayContaining(['comment_id', 'author', 'article_id', 'votes', 'created_at', 'body']));
+              expect(body.comment.votes).toBe(17);
+            });
+        });
+        test('Status:200 takes a newVotes object and updates the votes of the given comment, returns updated comment object', () => {
+          const newVote = { inc_votes: -20 };
+          return request(app)
+            .patch('/api/comments/3')
+            .send(newVote)
+            .expect(200)
+            .then(({ body }) => {
+              expect(Object.keys(body.comment)).toEqual(expect.arrayContaining(['comment_id', 'author', 'article_id', 'votes', 'created_at', 'body']));
+              expect(body.comment.votes).toBe(80);
+            });
+        });
+        test('Status:400 Bad Request when invalid comment ID is passed', () => {
+          const newVote = { inc_votes: 20 };
+          return request(app)
+            .patch('/api/comments/hellostring')
+            .send(newVote)
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe('Bad Request');
+            });
+        })
+        test('Status:400 Bad Request when incorrect newVote object is passed', () => {
+          const newVote = { blabla: 3 };
+          return request(app)
+            .patch('/api/comments/3')
+            .send(newVote)
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe('Bad Request');
+            });
+        })
+        test('Status:404 Resource Not Found error message when non-existent comment ID is passed', () => {
+          const newVote = { inc_votes: 20 };
+          return request(app)
+            .patch('/api/comments/12345')
+            .send(newVote)
+            .expect(404)
+            .then(({ body }) => {
+              expect(body.msg).toBe('No comment found for comment ID: 12345');
+            });
+        })
+      })
+      describe('DELETE method', () => { })
     })
   })
 

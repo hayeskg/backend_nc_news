@@ -77,8 +77,8 @@ const fetchArticles = (sorted_by, order, author, topic) => {
     .then((articles) => {
       if (articles.length === 0) {
         return Promise.reject({
-          status: 404,
-          msg: `No articles found to match your query.`,
+          status: 400,
+          msg: 'Bad Request - invalid query.',
         });
       } else {
         return articles;
