@@ -243,7 +243,15 @@ describe('app', () => {
               expect(body.msg).toBe('Bad Request');
             })
         })
-        test('Status:404 error message when non-existent article ID is passed', () => {
+        test('Status:400 Bad Request message when invalid queries are passed', () => {
+          return request(app)
+            .get('/api/articles/3333333/comments?sorted_by=blabla&blababla')
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toBe('Bad Request');
+            })
+        })
+        test('Status:404 Resource Not Found error message when non-existent article ID is passed', () => {
           return request(app)
             .get('/api/articles/3333333/comments')
             .expect(404)
@@ -274,8 +282,54 @@ describe('app', () => {
               expect(Array.isArray(body.articles)).toBe(true);
             });
         })
-      })
-
+        test('Status:200 Returns an array of articles, default to sorted by date created, descending', () => {
+          return request(app)
+            .get('/api/articles')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.articles).toBeSortedBy('created_at', {
+                descending: true,
+              });
+            });
+        })
+        test('Status:200 Returns an array of articles, works for sorted by author ascending', () => {
+          return request(app)
+            .get('/api/articles?sorted_by=author&order=asc')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.articles).toBeSortedBy('author');
+            });
+        })
+        test('Status:200 Returns an array of articles, filters by author', () => {
+          return request(app)
+            .get('/api/articles?author=rogersop')
+            .expect(200)
+            .then(({ body }) => {
+              body.articles.forEach((article) => {
+                expect(article.author).toBe('rogersop');
+              })
+            });
+        })
+        test('Status:200 Returns an array of articles, filters by topic', () => {
+          return request(app)
+            .get('/api/articles?topic=cats')
+            .expect(200)
+            .then(({ body }) => {
+              body.articles.forEach((article) => {
+                expect(article.topic).toBe('cats');
+              })
+            });
+        })
+        test('Status:404 Resource Not Found for invalid queries', () => {
+          return request(app)
+            .get('/api/articles?topic=notatopic&order=bla')
+            .expect(404)
+            .then(({ body }) => {
+              expect(body.msg).toBe('No articles found to match your query.');
+            })
+        });
+      });
     })
-  });
-});
+  })
+
+})

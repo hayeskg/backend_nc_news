@@ -62,14 +62,18 @@ const fetchCommentsByArticleId = (article_id, sorted_by, order) => {
     })
 }
 
-const fetchArticles = () => {
+const fetchArticles = (sorted_by, order, author, topic) => {
+
   return knex.select('articles.*')
     .count('comments.article_id as comment_count')
     .from('articles')
-    .orderBy('articles.article_id')
+    .orderBy(sorted_by || 'articles.created_at', order || 'desc')
     .leftJoin('comments', 'articles.article_id', '=', 'comments.article_id')
     .groupBy('articles.article_id')
-    //.where('articles.article_id', '=', article_id)
+    .modify(query => {
+      if (author) query.where('articles.author', author);
+      if (topic) query.where('articles.topic', topic);
+    })
     .then((articles) => {
       if (articles.length === 0) {
         return Promise.reject({
