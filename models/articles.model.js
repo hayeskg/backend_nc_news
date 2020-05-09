@@ -1,5 +1,7 @@
 const knex = require('../db/connection');
 
+const { isValuePresentInTableColumn } = require('./utils.model');
+
 const fetchArticleByArticleId = (article_id) => {
   return knex.select('articles.*')
     .count('comments.article_id as comment_count')
@@ -64,10 +66,12 @@ const fetchCommentsByArticleId = (article_id, sorted_by, order) => {
 
 const fetchArticles = (sorted_by, order, author, topic) => {
 
+  ///write a function to check if a value exists in a particular column
+
   return knex.select('articles.*')
     .count('comments.article_id as comment_count')
     .from('articles')
-    .orderBy(sorted_by || 'articles.created_at', order || 'desc')
+    .orderBy(sorted_by || 'articles.created_at', order || 'asc')
     .leftJoin('comments', 'articles.article_id', '=', 'comments.article_id')
     .groupBy('articles.article_id')
     .modify(query => {
@@ -87,3 +91,4 @@ const fetchArticles = (sorted_by, order, author, topic) => {
 }
 
 module.exports = { fetchArticleByArticleId, updateArticleByArticleId, fetchCommentsByArticleId, fetchArticles }
+

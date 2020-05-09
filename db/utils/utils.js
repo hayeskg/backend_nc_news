@@ -1,3 +1,5 @@
+const knex = require('../../db/connection');
+
 exports.formatDates = (list, key) => {
   const objectsDateFormatted = list.map(obj => {
     return { ...obj };
@@ -18,7 +20,6 @@ exports.makeRefObj = (list, value, key) => {
     let newValue = obj[`${value}`];
     refObj[newKey] = newValue;
   });
-
   return refObj;
 };
 
@@ -37,3 +38,5 @@ exports.formatComments = (comments, articleRef, keyToAdd, keyToRemove) => {
   })
   return formattedComments;
 };
+
+

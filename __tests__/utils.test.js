@@ -4,6 +4,7 @@ const {
   formatComments,
 } = require('../db/utils/utils');
 
+
 describe('formatDates', () => {
   it('Take an array of objects and return a new array', () => {
     expect(formatDates([])).toEqual([]);
@@ -179,3 +180,4 @@ describe('formatComments', () => {
     expect(lookup).toEqual({ '22 Amazing open source React projects': 3 });
   })
 });
+

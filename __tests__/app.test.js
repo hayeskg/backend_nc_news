@@ -295,17 +295,25 @@ describe('app', () => {
             .get('/api/articles')
             .expect(200)
             .then(({ body }) => {
-              expect(body.articles).toBeSortedBy('created_at', {
-                descending: true,
-              });
+              expect(body.articles).toBeSortedBy('created_at');
             });
         })
         test('Status:200 Returns an array of articles, works for sorted by author ascending', () => {
           return request(app)
-            .get('/api/articles?sorted_by=author&order=asc')
+            .get('/api/articles?sorted_by=author')
             .expect(200)
             .then(({ body }) => {
               expect(body.articles).toBeSortedBy('author');
+              expect(body.articles[0].author).toBe('butter_bridge')
+            });
+        })
+        test('Status:200 Returns an array of articles, works for sorted by author descending', () => {
+          return request(app)
+            .get('/api/articles?sorted_by=author&order=desc')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.articles).toBeSortedBy('author', { descending: true });
+              expect(body.articles[0].author).toBe('rogersop')
             });
         })
         test('Status:200 Returns an array of articles, filters by author', () => {
@@ -316,6 +324,14 @@ describe('app', () => {
               body.articles.forEach((article) => {
                 expect(article.author).toBe('rogersop');
               })
+            });
+        })
+        test('Status:200 Returns an empty array of articles, if author has no articles', () => {
+          return request(app)
+            .get('/api/articles?author=lurker')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.articles.length).toBe(0);
             });
         })
         test('Status:200 Returns an array of articles, filters by topic', () => {
@@ -426,5 +442,4 @@ describe('app', () => {
       })
     })
   })
-
 })
