@@ -48,7 +48,8 @@ const updateArticleByArticleId = (article_id, vote) => {
 }
 
 const fetchCommentsByArticleId = (article_id, sorted_by, order) => {
-  return knex.select('*')
+  return knex
+    .select('*')
     .from('comments')
     .orderBy(sorted_by || 'created_at', order || 'desc')
     .where('article_id', article_id)
@@ -65,30 +66,117 @@ const fetchCommentsByArticleId = (article_id, sorted_by, order) => {
 }
 
 const fetchArticles = (sorted_by, order, author, topic) => {
+  const authorExistsPromise = isValuePresentInTableColumn('users', 'username', `${author}`);
+  const topicExistsPromise = isValuePresentInTableColumn('topics', 'slug', `${topic}`);
 
-  ///write a function to check if a value exists in a particular column
-
-  return knex.select('articles.*')
-    .count('comments.article_id as comment_count')
-    .from('articles')
-    .orderBy(sorted_by || 'articles.created_at', order || 'asc')
-    .leftJoin('comments', 'articles.article_id', '=', 'comments.article_id')
-    .groupBy('articles.article_id')
-    .modify(query => {
-      if (author) query.where('articles.author', author);
-      if (topic) query.where('articles.topic', topic);
-    })
-    .then((articles) => {
-      if (articles.length === 0) {
+  return Promise.all([authorExistsPromise, topicExistsPromise])
+    .then((results) => {
+      if ((author) && results[0] === false) {
         return Promise.reject({
-          status: 400,
+          status: 404,
+          msg: 'Bad Request - invalid query.',
+        });
+      } else if ((topic) && results[1] === false) {
+        return Promise.reject({
+          status: 404,
           msg: 'Bad Request - invalid query.',
         });
       } else {
-        return articles;
+        return knex.select('articles.*')
+          .count('comments.article_id as comment_count')
+          .from('articles')
+          .orderBy(sorted_by || 'articles.created_at', order || 'asc')
+          .leftJoin('comments', 'articles.article_id', '=', 'comments.article_id')
+          .groupBy('articles.article_id')
+          .modify(query => {
+            if (author) query.where('articles.author', author);
+            if (topic) query.where('articles.topic', topic);
+          })
       }
     })
+    .then((articles) => {
+      return articles;
+    })
+
 }
+
 
 module.exports = { fetchArticleByArticleId, updateArticleByArticleId, fetchCommentsByArticleId, fetchArticles }
 
+
+
+
+// const authorExistsPromise = isValuePresentInTableColumn('users', 'username', `${author}`);
+// const topicExistsPromise = isValuePresentInTableColumn('topics', 'slug', `${topic}`);
+
+// return knex.select('articles.*')
+//   .count('comments.article_id as comment_count')
+//   .from('articles')
+//   .orderBy(sorted_by || 'articles.created_at', order || 'asc')
+//   .leftJoin('comments', 'articles.article_id', '=', 'comments.article_id')
+//   .groupBy('articles.article_id')
+//   .modify(query => {
+//     if (author) query.where('articles.author', author);
+//     if (topic) query.where('articles.topic', topic);
+//   })
+//   .then((articles) => {
+//     if (author) {
+//       if (topic) {
+//         return Promise.all([authorExistsPromise, topicExistsPromise, articles]);
+//       } else {
+//         return Promise.all([authorExistsPromise, 'topicPlaceholder', articles]);
+//       }
+//     } else if (topic) {
+//       Promise.all(['authorPlaceholder', topicExistsPromise, articles]);
+//     } else {
+//       return Promise.all(['authorPlaceholder', 'topicPlaceholder', articles]);
+//     }
+
+//   })
+//   .then((results) => {
+//     console.log(results);
+//     // if (authorPresent === false) {
+//     //   return Promise.reject({
+//     //     status: 404,
+//     //     msg: 'Bad Request - invalid query.',
+//     //   })
+//     // } else if (topicPresent === false) {
+//     //   return Promise.reject({
+//     //     status: 404,
+//     //     msg: 'Bad Request - invalid query.',
+//     //   })
+//     // } else {
+//     //   return articles;
+//     // }
+//   })
+
+
+
+
+
+
+
+  // .then((articles) => {
+  //   if (isValuePresentInTableColumn('articles', 'author', `${author}`) === false) {
+  //     return articles;
+  //   } else {
+  //     return false;
+  //   }
+  // })
+  // .then((articles) => {
+  //   if (isValuePresentInTableColumn('articles', 'topic', `${topic}`) === true) {
+  //     return articles;
+  //   } else {
+  //     return false;
+  //   }
+  // })
+  // .then(result => {
+  //   if (result === false) {
+  //     return Promise.reject({
+  //       status: 404,
+  //       msg: 'Bad Request - invalid query.',
+  //     });
+  //   } else {
+  //     return result;
+  //   }
+  // })

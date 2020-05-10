@@ -129,6 +129,15 @@ describe('app', () => {
               expect(body.article.article_id).toBe(3);
             });
         });
+        test('Status:200 test for another article ID', () => {
+          return request(app)
+            .get('/api/articles/3')
+            .expect(200)
+            .then(({ body }) => {
+              expect(Object.keys(body.article)).toEqual(expect.arrayContaining(['author', 'title', 'article_id', 'body', 'topic', 'created_at', 'votes', 'comment_count']));
+              expect(body.article.article_id).toBe(3);
+            });
+        });
         test('Status:400 Bad Request when invalid article ID is passed', () => {
           return request(app)
             .get('/api/articles/hellostring')
@@ -332,6 +341,7 @@ describe('app', () => {
             .expect(200)
             .then(({ body }) => {
               expect(body.articles.length).toBe(0);
+
             });
         })
         test('Status:200 Returns an array of articles, filters by topic', () => {
@@ -339,15 +349,21 @@ describe('app', () => {
             .get('/api/articles?topic=cats')
             .expect(200)
             .then(({ body }) => {
-              body.articles.forEach((article) => {
-                expect(article.topic).toBe('cats');
-              })
+              expect(body.articles.length).toBe(1);
             });
         })
-        test('Status:400 Bad Request for invalid queries', () => {
+        test('Status:404 Bad Request for invalid queries', () => {
           return request(app)
-            .get('/api/articles?topic=notatopic&order=bla')
-            .expect(400)
+            .get('/api/articles?topic=notatopic')
+            .expect(404)
+            .then(({ body }) => {
+              expect(body.msg).toBe('Bad Request - invalid query.');
+            })
+        });
+        test('Status:404 Bad Request for invalid username', () => {
+          return request(app)
+            .get('/api/articles?author=notanauthor')
+            .expect(404)
             .then(({ body }) => {
               expect(body.msg).toBe('Bad Request - invalid query.');
             })
