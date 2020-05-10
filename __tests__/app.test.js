@@ -17,6 +17,14 @@ describe('app', () => {
           expect(body.msg).toBe('Route not found');
         })
     })
+    test('Status:405 - Method Not Allowed message when client tries to use a method on /api', () => {
+      return request(app)
+        .del('/api')
+        .expect(405)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Method not allowed');
+        })
+    })
     describe('/topics', () => {
       test('Status: 404 - Route not found when client tries an incorrect endpoint path', () => {
         return request(app)
@@ -239,30 +247,28 @@ describe('app', () => {
             .get('/api/articles/1/comments')
             .expect(200)
             .then(({ body }) => {
-              expect(body.comments).toBeSortedBy('created_at', {
-                descending: true,
-              });
+              expect(body.comments).toBeSortedBy('created_at');
             });
         })
         test('Status:200 Accepts a sort_by query for any valid column - tested with sort_by = author, ascending', () => {
           return request(app)
-            .get('/api/articles/1/comments?sorted_by=author&order=asc')
+            .get('/api/articles/1/comments?sorted_by=author')
             .expect(200)
             .then(({ body }) => {
               expect(body.comments).toBeSortedBy('author');
             });
         })
+        test('Status:200 Returns an empty comments array when no comments are available for a valid article_id', () => {
+          return request(app)
+            .get('/api/articles/2/comments')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.comments.length).toBeSortedBy(0);
+            });
+        })
         test('Status:400 Bad Request when invalid article ID is passed', () => {
           return request(app)
             .get('/api/articles/hellostring/comments')
-            .expect(400)
-            .then(({ body }) => {
-              expect(body.msg).toBe('Bad Request');
-            })
-        })
-        test('Status:400 Bad Request message when invalid queries are passed', () => {
-          return request(app)
-            .get('/api/articles/3333333/comments?sorted_by=blabla&blababla')
             .expect(400)
             .then(({ body }) => {
               expect(body.msg).toBe('Bad Request');
@@ -274,6 +280,62 @@ describe('app', () => {
             .expect(404)
             .then(({ body }) => {
               expect(body.msg).toBe('No comments found for article_id: 3333333');
+            })
+        })
+      })
+      describe('POST method', () => {
+        test('Status:201 Takes accepts a newComment object and responsds with a newly posted comment', () => {
+          const newComment = { username: 'lurker', body: 'Just here for the peace and quiet!' }
+          return request(app)
+            .post('/api/articles/3/comments')
+            .send(newComment)
+            .expect(201)
+            .then(({ body }) => {
+              expect(Object.keys(body.comment)).toEqual(expect.arrayContaining(['comment_id', 'author', 'article_id', 'votes', 'created_at', 'body']));
+              expect(body.comment.author).toBe('lurker');
+              expect(body.comment.comment_id).toBe(19);
+            })
+        })
+        test('Status:201 Works with another username', () => {
+          const newComment = { username: 'rogersop', body: 'Another awesome comment!' }
+          return request(app)
+            .post('/api/articles/5/comments')
+            .send(newComment)
+            .expect(201)
+            .then(({ body }) => {
+              expect(Object.keys(body.comment)).toEqual(expect.arrayContaining(['comment_id', 'author', 'article_id', 'votes', 'created_at', 'body']));
+              expect(body.comment.author).toBe('rogersop');
+              expect(body.comment.comment_id).toBe(19);
+            })
+        })
+        test('Status:400 Bad Request when incorrect POST newComment object', () => {
+          const newComment = {}
+          return request(app)
+            .post('/api/articles/5/comments')
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toEqual(`Not possible to post comment.`);
+            })
+        })
+        test('Status:400 Route not found for out of range article ID', () => {
+          const newComment = {}
+          return request(app)
+            .post('/api/articles/not-valid-id/comments')
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).toEqual('Bad Request');
+            })
+        })
+        test('Status:404 Route not found for out of range article ID', () => {
+          const newComment = {}
+          return request(app)
+            .post('/api/articles/1000000/comments')
+            .send(newComment)
+            .expect(404)
+            .then(({ body }) => {
+              expect(body.msg).toEqual('Article ID not found.');
             })
         })
       })

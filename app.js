@@ -5,12 +5,13 @@ const {
   handleCustomErrors,
   handlePsqlErrors,
   handleServerErrors,
+  handleMethodNotAllowed,
   send404,
 } = require('./errors/index.js');
 
 
 app.use(express.json());
-app.use('/api', apiRouter);
+app.use('/api', apiRouter).all(handleMethodNotAllowed);
 
 app.all('/*', send404);
 

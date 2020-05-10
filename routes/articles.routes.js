@@ -1,5 +1,5 @@
 const articlesRouter = require('express').Router();
-const { getArticleByArticleId, patchArticleByArticleId, getCommentsByArticleId, getArticles } = require('../controllers/articles.controller');
+const { getArticleByArticleId, patchArticleByArticleId, getCommentsByArticleId, getArticles, postCommentByArticleId } = require('../controllers/articles.controller');
 const { handleMethodNotAllowed } = require('../errors/index');
 
 articlesRouter.route('/')
@@ -13,6 +13,7 @@ articlesRouter.route('/:article_id')
 
 articlesRouter.route('/:article_id/comments')
   .get(getCommentsByArticleId)
+  .post(postCommentByArticleId)
   .all(handleMethodNotAllowed);
 
 module.exports = articlesRouter;

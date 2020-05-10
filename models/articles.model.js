@@ -48,21 +48,27 @@ const updateArticleByArticleId = (article_id, vote) => {
 }
 
 const fetchCommentsByArticleId = (article_id, sorted_by, order) => {
-  return knex
-    .select('*')
-    .from('comments')
-    .orderBy(sorted_by || 'created_at', order || 'desc')
-    .where('article_id', article_id)
-    .then(comments => {
-      if (comments.length === 0) {
+  const articleExistsPromise = isValuePresentInTableColumn('articles', 'article_id', `${article_id}`)
+
+  return articleExistsPromise
+    .then((articleExists) => {
+      if ((article_id) && articleExists === false) {
         return Promise.reject({
           status: 404,
           msg: `No comments found for article_id: ${article_id}`,
         });
       } else {
-        return comments;
+        return knex
+          .select('*')
+          .from('comments')
+          .orderBy(sorted_by || 'created_at', order || 'asc')
+          .where('article_id', article_id)
       }
     })
+    .then((comments) => {
+      return comments;
+    })
+
 }
 
 const fetchArticles = (sorted_by, order, author, topic) => {
@@ -100,83 +106,37 @@ const fetchArticles = (sorted_by, order, author, topic) => {
 
 }
 
+const insertCommentByArticleId = (username, article_id, body) => {
+  const userExistsPromise = isValuePresentInTableColumn('users', 'username', `${username}`);
+  const articleIdExistsPromise = isValuePresentInTableColumn('articles', 'article_id', `${article_id}`);
 
-module.exports = { fetchArticleByArticleId, updateArticleByArticleId, fetchCommentsByArticleId, fetchArticles }
+  return Promise.all([userExistsPromise, articleIdExistsPromise])
+    .then(([userValid, articleIdValid]) => {
+      if (userValid === true && articleIdValid === true) {
+        return knex('comments')
+          .returning("*")
+          .insert({ article_id: article_id, author: username, body: body })
+          .into('comments')
+          .then((comment) => {
+            return comment[0];
+          })
+      } else if (articleIdValid === false) {
+        return Promise.reject({
+          status: 404,
+          msg: 'Article ID not found.',
+        });
+      } else {
+        return Promise.reject({
+          status: 400,
+          msg: `Not possible to post comment.`,
+        });
+      }
+    })
+}
 
 
-
-
-// const authorExistsPromise = isValuePresentInTableColumn('users', 'username', `${author}`);
-// const topicExistsPromise = isValuePresentInTableColumn('topics', 'slug', `${topic}`);
-
-// return knex.select('articles.*')
-//   .count('comments.article_id as comment_count')
-//   .from('articles')
-//   .orderBy(sorted_by || 'articles.created_at', order || 'asc')
-//   .leftJoin('comments', 'articles.article_id', '=', 'comments.article_id')
-//   .groupBy('articles.article_id')
-//   .modify(query => {
-//     if (author) query.where('articles.author', author);
-//     if (topic) query.where('articles.topic', topic);
-//   })
-//   .then((articles) => {
-//     if (author) {
-//       if (topic) {
-//         return Promise.all([authorExistsPromise, topicExistsPromise, articles]);
-//       } else {
-//         return Promise.all([authorExistsPromise, 'topicPlaceholder', articles]);
-//       }
-//     } else if (topic) {
-//       Promise.all(['authorPlaceholder', topicExistsPromise, articles]);
-//     } else {
-//       return Promise.all(['authorPlaceholder', 'topicPlaceholder', articles]);
-//     }
-
-//   })
-//   .then((results) => {
-//     console.log(results);
-//     // if (authorPresent === false) {
-//     //   return Promise.reject({
-//     //     status: 404,
-//     //     msg: 'Bad Request - invalid query.',
-//     //   })
-//     // } else if (topicPresent === false) {
-//     //   return Promise.reject({
-//     //     status: 404,
-//     //     msg: 'Bad Request - invalid query.',
-//     //   })
-//     // } else {
-//     //   return articles;
-//     // }
-//   })
+module.exports = { fetchArticleByArticleId, updateArticleByArticleId, fetchCommentsByArticleId, fetchArticles, insertCommentByArticleId }
 
 
 
 
-
-
-
-  // .then((articles) => {
-  //   if (isValuePresentInTableColumn('articles', 'author', `${author}`) === false) {
-  //     return articles;
-  //   } else {
-  //     return false;
-  //   }
-  // })
-  // .then((articles) => {
-  //   if (isValuePresentInTableColumn('articles', 'topic', `${topic}`) === true) {
-  //     return articles;
-  //   } else {
-  //     return false;
-  //   }
-  // })
-  // .then(result => {
-  //   if (result === false) {
-  //     return Promise.reject({
-  //       status: 404,
-  //       msg: 'Bad Request - invalid query.',
-  //     });
-  //   } else {
-  //     return result;
-  //   }
-  // })

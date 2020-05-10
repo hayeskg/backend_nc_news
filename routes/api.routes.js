@@ -3,15 +3,15 @@ const topicsRouter = require('./topics.routes');
 const usersRouter = require('./users.routes');
 const articlesRouter = require('./articles.routes');
 const commentsRouter = require('./comments.routes');
-const { send404 } = require('../errors/index');
+const { handleMethodNotAllowed } = require('../errors/index');
 
 
 
-apiRouter.use('/topics', topicsRouter);
-apiRouter.use('/users', usersRouter);
-apiRouter.use('/articles', articlesRouter);
-apiRouter.use('/comments', commentsRouter);
+apiRouter.use('/topics', topicsRouter).all(handleMethodNotAllowed);
+apiRouter.use('/users', usersRouter).all(handleMethodNotAllowed);
+apiRouter.use('/articles', articlesRouter).all(handleMethodNotAllowed);
+apiRouter.use('/comments', commentsRouter).all(handleMethodNotAllowed);
 
-apiRouter.all('/*', send404);
+apiRouter.all('/', handleMethodNotAllowed);
 
 module.exports = apiRouter;
