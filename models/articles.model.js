@@ -17,34 +17,27 @@ const fetchArticleByArticleId = (article_id) => {
           msg: `No article found for article_id: ${article_id}`,
         });
       } else {
-        return article;
+        return article[0];
       }
     })
 }
 
 const updateArticleByArticleId = (article_id, vote) => {
   return knex
-    .select('votes')
-    .from('articles')
-    .where('article_id', '=', article_id)
-    .then(votes => {
-      if (votes.length === 0) {
+    .returning("*")
+    .where({ article_id: article_id })
+    .increment({ votes: vote })
+    .into('articles')
+    .then((article) => {
+      if (article.length === 0) {
         return Promise.reject({
           status: 404,
           msg: `No article found for article_id: ${article_id}`,
         });
       } else {
-        const temp = parseInt(votes[0].votes) + vote;
-        return knex
-          .returning("*")
-          .where({ article_id: article_id })
-          .update({ votes: temp })
-          .into('articles')
-          .then(() => {
-            return fetchArticleByArticleId(article_id);
-          })
+        return article[0];
       }
-    });
+    })
 }
 
 const fetchCommentsByArticleId = (article_id, sorted_by, order) => {

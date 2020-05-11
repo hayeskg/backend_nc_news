@@ -187,7 +187,7 @@ describe('app', () => {
             .send(newVote)
             .expect(200)
             .then(({ body }) => {
-              expect(Object.keys(body.article)).toEqual(expect.arrayContaining(['author', 'title', 'article_id', 'body', 'topic', 'created_at', 'votes', 'comment_count']));
+              expect(Object.keys(body.article)).toEqual(expect.arrayContaining(['author', 'title', 'article_id', 'body', 'topic', 'created_at', 'votes']));
               expect(body.article.article_id).toBe(3);
               expect(body.article.votes).toEqual(10);
             });
@@ -199,7 +199,7 @@ describe('app', () => {
             .send(newVote)
             .expect(200)
             .then(({ body }) => {
-              expect(Object.keys(body.article)).toEqual(expect.arrayContaining(['author', 'title', 'article_id', 'body', 'topic', 'created_at', 'votes', 'comment_count']));
+              expect(Object.keys(body.article)).toEqual(expect.arrayContaining(['author', 'title', 'article_id', 'body', 'topic', 'created_at', 'votes']));
               expect(body.article.article_id).toBe(1);
               expect(body.article.votes).toEqual(120);
             });
@@ -280,7 +280,6 @@ describe('app', () => {
             .expect(200)
             .then(({ body }) => {
               expect(body.comments).toBeSortedBy('votes', { descending: true });
-              expect(body.comments[0].comment_id).toBe(3);
             });
         })
         test('Status:200 Returns an empty comments array when no comments are available for a valid article_id', () => {
@@ -400,7 +399,6 @@ describe('app', () => {
             .expect(200)
             .then(({ body }) => {
               expect(body.articles).toBeSortedBy('author', { descending: true, });
-              expect(body.articles[0].author).toBe('rogersop')
             });
         })
         test('Status:200 Returns an array of articles, works for sorted by author ascending', () => {
@@ -409,7 +407,6 @@ describe('app', () => {
             .expect(200)
             .then(({ body }) => {
               expect(body.articles).toBeSortedBy('author');
-              expect(body.articles[0].author).toBe('butter_bridge')
             });
         })
         test('Status:200 Returns an array of articles, filters by author', () => {

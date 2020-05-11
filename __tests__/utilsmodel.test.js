@@ -13,22 +13,17 @@ afterAll(() => { return connection.destroy() });
 
 
 describe('isValuePresentInTableColumn', () => {
-  it('Takes a table name, column name and value and returns a boolean', () => {
-    return isValuePresentInTableColumn('articles', 'author', 'lurker').then(isPresent => {
-      expect(typeof isPresent).toBe('boolean');
+  test('Takes a table name, column name and value and returns a boolean', () => {
+    return isValuePresentInTableColumn('articles', 'author', 'lurker').then((response) => {
+      expect(response).toBe(false);
     })
   })
-  it('Works for true', () => {
+  test('Works for true', () => {
     return isValuePresentInTableColumn('articles', 'author', 'butter_bridge').then(isPresent => {
       expect(isPresent).toBe(true);
     })
   })
-  it('Works for false', () => {
-    return isValuePresentInTableColumn('articles', 'author', 'lurker').then(isPresent => {
-      expect(isPresent).toBe(false);
-    })
-  })
-  it('Works for another table and inputs', () => {
+  test('Works for another table and inputs', () => {
     return isValuePresentInTableColumn('comments', 'article_id', '2').then(isPresent => {
       expect(isPresent).toBe(false);
     })

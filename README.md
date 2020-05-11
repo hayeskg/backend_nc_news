@@ -9,6 +9,8 @@ An Express server built on NodeJS and PostgreSQL with a list of available API en
 
 The application is designed to store and manage articles with users able to comment and vote on articles.
 
+App is live on: https://nc-news-hayeskg.herokuapp.com/ 
+
 ## Getting Started
 
 To run the application on a local development machine, clone or fork the project from: https://github.com/hayeskg/portfolio_nc_news 
