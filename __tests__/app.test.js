@@ -98,6 +98,14 @@ describe('app', () => {
               expect(Object.keys(body.user)).toEqual(expect.arrayContaining(['username', 'name', 'avatar_url']));
             });
         });
+        test('Status:200 works with another valid user', () => {
+          return request(app)
+            .get('/api/users/lurker')
+            .expect(200)
+            .then(({ body }) => {
+              expect(Object.keys(body.user)).toEqual(expect.arrayContaining(['username', 'name', 'avatar_url']));
+            });
+        });
         test('Status:404 error message when GET request with non-existent username', () => {
           return request(app)
             .get('/api/users/notValidUsername')

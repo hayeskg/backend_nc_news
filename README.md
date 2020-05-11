@@ -1,6 +1,13 @@
 # Northcoders News API
 
-**You can clone this repository but do not fork it**
+An Express server built on NodeJS and PostgreSQL with a list of available API endpoints, to serve up data on:
+
+* topics
+* users
+* articles
+* comments
+
+The application is designed to store and manage articles with users able to comment and vote on articles.
 
 ## Background
 
