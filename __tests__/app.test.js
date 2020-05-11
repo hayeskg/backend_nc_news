@@ -26,7 +26,7 @@ describe('app', () => {
         })
     })
     describe('/topics', () => {
-      test('Status: 404 - Route not found when client tries an incorrect endpoint path', () => {
+      test('Status:404 - Route not found when client tries an incorrect endpoint path', () => {
         return request(app)
           .get('/api/topics/whatever')
           .expect(404)
@@ -247,15 +247,24 @@ describe('app', () => {
             .get('/api/articles/1/comments')
             .expect(200)
             .then(({ body }) => {
-              expect(body.comments).toBeSortedBy('created_at');
+              expect(body.comments).toBeSortedBy('created_at', { descending: true });
             });
         })
         test('Status:200 Accepts a sort_by query for any valid column - tested with sort_by = author, ascending', () => {
           return request(app)
-            .get('/api/articles/1/comments?sorted_by=author')
+            .get('/api/articles/1/comments?sorted_by=author&order=asc')
             .expect(200)
             .then(({ body }) => {
               expect(body.comments).toBeSortedBy('author');
+            });
+        })
+        test('Status:200 Accepts a sort_by query for any valid column - tested with sort_by = votes, ascending', () => {
+          return request(app)
+            .get('/api/articles/1/comments?sorted_by=votes')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.comments).toBeSortedBy('votes', { descending: true });
+              expect(body.comments[0].comment_id).toBe(3);
             });
         })
         test('Status:200 Returns an empty comments array when no comments are available for a valid article_id', () => {
@@ -366,25 +375,25 @@ describe('app', () => {
             .get('/api/articles')
             .expect(200)
             .then(({ body }) => {
-              expect(body.articles).toBeSortedBy('created_at');
-            });
-        })
-        test('Status:200 Returns an array of articles, works for sorted by author ascending', () => {
-          return request(app)
-            .get('/api/articles?sorted_by=author')
-            .expect(200)
-            .then(({ body }) => {
-              expect(body.articles).toBeSortedBy('author');
-              expect(body.articles[0].author).toBe('butter_bridge')
+              expect(body.articles).toBeSortedBy('created_at', { descending: true, });
             });
         })
         test('Status:200 Returns an array of articles, works for sorted by author descending', () => {
           return request(app)
-            .get('/api/articles?sorted_by=author&order=desc')
+            .get('/api/articles?sorted_by=author')
             .expect(200)
             .then(({ body }) => {
-              expect(body.articles).toBeSortedBy('author', { descending: true });
+              expect(body.articles).toBeSortedBy('author', { descending: true, });
               expect(body.articles[0].author).toBe('rogersop')
+            });
+        })
+        test('Status:200 Returns an array of articles, works for sorted by author ascending', () => {
+          return request(app)
+            .get('/api/articles?sorted_by=author&order=asc')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.articles).toBeSortedBy('author');
+              expect(body.articles[0].author).toBe('butter_bridge')
             });
         })
         test('Status:200 Returns an array of articles, filters by author', () => {
@@ -412,6 +421,14 @@ describe('app', () => {
             .expect(200)
             .then(({ body }) => {
               expect(body.articles.length).toBe(1);
+            });
+        })
+        test('Status:200 Returns an array of articles, filters by topic', () => {
+          return request(app)
+            .get('/api/articles?topic=paper')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.articles.length).toBe(0);
             });
         })
         test('Status:404 Bad Request for invalid queries', () => {
