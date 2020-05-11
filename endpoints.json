@@ -14,8 +14,98 @@
       ]
     }
   },
+  "GET /api/users/:username": {
+    "description": "object with of a single user by username",
+    "queries": [],
+    "exampleResponse": {
+      "user": {
+        "username": "rogersop",
+        "avatar_url": "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
+        "name": "paul"
+      }
+    }
+  },
+  "GET /api/articles/:artcle_id": {
+    "description": "returns an article object by article_id",
+    "queries": [],
+    "exampleResponse": {
+      "article": {
+        "article_id": 12,
+        "title": "The battle for Node.js security has only begun",
+        "body": "The founder of the Node Security Project says Node.js still...",
+        "votes": 0,
+        "topic": "coding",
+        "author": "tickle122",
+        "created_at": "2017-07-17T11:34:54.879Z",
+        "comment_count": "7"
+      }
+    }
+  },
+  "PATCH /api/articles/:artcle_id": {
+    "description": "updates the vote count on an article, returns updated article ",
+    "queries": [],
+    "reqeust_body": [
+      {
+        "inc_votes": 10
+      }
+    ],
+    "exampleResponse": {
+      "article": {
+        "article_id": 12,
+        "title": "The battle for Node.js security has only begun",
+        "body": "The founder of the Node Security Project says Node.js still...",
+        "votes": 0,
+        "topic": "coding",
+        "author": "tickle122",
+        "created_at": "2017-07-17T11:34:54.879Z",
+        "comment_count": "17"
+      }
+    }
+  },
+  "POST /api/articles/:artcle_id/comments": {
+    "description": "posts a new comment by article id, returns new comment",
+    "queries": [
+      "sort_by",
+      "order"
+    ],
+    "request_body": [
+      {
+        "username": "rogersop",
+        "body": "Another awesome comment"
+      }
+    ],
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 444,
+        "author": "bello",
+        "article_id": 12,
+        "votes": 7,
+        "created_at": "2020-05-10T14:07:56.079Z",
+        "body": "Quaerat impedit totam unde sint recusandae aut ratione repudiandae libero. Ut corporis neque."
+      }
+    }
+  },
+  "GET /api/articles/:artcle_id/comments": {
+    "description": "returns an array of comments linked to the article id",
+    "queries": [
+      "sort_by",
+      "order"
+    ],
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 244,
+          "author": "jessjelly",
+          "article_id": 12,
+          "votes": 7,
+          "created_at": "2017-10-12T14:07:56.079Z",
+          "body": "Quaerat impedit totam unde sint recusandae aut ratione repudiandae libero. Ut corporis neque."
+        }
+      ]
+    }
+  },
   "GET /api/articles": {
-    "description": "serves an array of all topics",
+    "description": "serves an array of all articles, accepts queries",
     "queries": [
       "author",
       "topic",
@@ -33,5 +123,28 @@
         }
       ]
     }
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "updates the vote count on a comment",
+    "queries": [],
+    "request_body": {
+      "inc_votes": 1
+    },
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 276,
+        "author": "weegembump",
+        "article_id": 12,
+        "votes": 20,
+        "created_at": "2016-02-18T21:26:02.765Z",
+        "body": "Voluptatem unde dolor id et. Voluptas vitae soluta. Rerum aperiam illum dolores ducimus optio et possimus dolorum quo."
+      }
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes a comment by comment id",
+    "queries": [],
+    "request_body": {},
+    "exampleResponse": {}
   }
 }

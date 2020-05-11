@@ -15,7 +15,6 @@ afterAll(() => { return connection.destroy() });
 describe('isValuePresentInTableColumn', () => {
   it('Takes a table name, column name and value and returns a boolean', () => {
     return isValuePresentInTableColumn('articles', 'author', 'lurker').then(isPresent => {
-      console.log(isPresent);
       expect(typeof isPresent).toBe('boolean');
     })
   })

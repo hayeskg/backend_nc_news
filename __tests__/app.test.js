@@ -9,6 +9,14 @@ afterAll(() => { return connection.destroy() });
 
 describe('app', () => {
   describe('/api', () => {
+    test('Status:200 GET request responds with a list of available API endpoints', () => {
+      return request(app)
+        .get('/api')
+        .expect(200)
+        .then(({ body }) => {
+          expect(typeof body).toBe('object');
+        })
+    })
     test('Status:404 - Route not found when client tries an incorrect endpoint path', () => {
       return request(app)
         .get('/api/whatever')
