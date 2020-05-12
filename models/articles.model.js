@@ -40,7 +40,7 @@ const updateArticleByArticleId = (article_id, vote) => {
     })
 }
 
-const fetchCommentsByArticleId = (article_id, sorted_by, order) => {
+const fetchCommentsByArticleId = (article_id, sort_by, order) => {
   const articleExistsPromise = isValuePresentInTableColumn('articles', 'article_id', `${article_id}`)
 
   return articleExistsPromise
@@ -54,7 +54,7 @@ const fetchCommentsByArticleId = (article_id, sorted_by, order) => {
         return knex
           .select('*')
           .from('comments')
-          .orderBy(sorted_by || 'created_at', order || 'desc')
+          .orderBy(sort_by || 'created_at', order || 'desc')
           .where('article_id', article_id)
       }
     })
@@ -64,7 +64,7 @@ const fetchCommentsByArticleId = (article_id, sorted_by, order) => {
 
 }
 
-const fetchArticles = (sorted_by, order, author, topic) => {
+const fetchArticles = (sort_by, order, author, topic) => {
   const authorExistsPromise = isValuePresentInTableColumn('users', 'username', `${author}`);
   const topicExistsPromise = isValuePresentInTableColumn('topics', 'slug', `${topic}`);
 
@@ -84,7 +84,7 @@ const fetchArticles = (sorted_by, order, author, topic) => {
         return knex.select('articles.*')
           .count('comments.article_id as comment_count')
           .from('articles')
-          .orderBy(sorted_by || 'articles.created_at', order || 'desc')
+          .orderBy(sort_by || 'articles.created_at', order || 'desc')
           .leftJoin('comments', 'articles.article_id', '=', 'comments.article_id')
           .groupBy('articles.article_id')
           .modify(query => {

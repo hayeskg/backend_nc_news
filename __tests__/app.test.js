@@ -268,7 +268,7 @@ describe('app', () => {
         })
         test('Status:200 Accepts a sort_by query for any valid column - tested with sort_by = author, ascending', () => {
           return request(app)
-            .get('/api/articles/1/comments?sorted_by=author&order=asc')
+            .get('/api/articles/1/comments?sort_by=author&order=asc')
             .expect(200)
             .then(({ body }) => {
               expect(body.comments).toBeSortedBy('author');
@@ -276,7 +276,7 @@ describe('app', () => {
         })
         test('Status:200 Accepts a sort_by query for any valid column - tested with sort_by = votes, ascending', () => {
           return request(app)
-            .get('/api/articles/1/comments?sorted_by=votes')
+            .get('/api/articles/1/comments?sort_by=votes')
             .expect(200)
             .then(({ body }) => {
               expect(body.comments).toBeSortedBy('votes', { descending: true });
@@ -395,7 +395,7 @@ describe('app', () => {
         })
         test('Status:200 Returns an array of articles, works for sorted by author descending', () => {
           return request(app)
-            .get('/api/articles?sorted_by=author')
+            .get('/api/articles?sort_by=author')
             .expect(200)
             .then(({ body }) => {
               expect(body.articles).toBeSortedBy('author', { descending: true, });
@@ -403,7 +403,7 @@ describe('app', () => {
         })
         test('Status:200 Returns an array of articles, works for sorted by author ascending', () => {
           return request(app)
-            .get('/api/articles?sorted_by=author&order=asc')
+            .get('/api/articles?sort_by=author&order=asc')
             .expect(200)
             .then(({ body }) => {
               expect(body.articles).toBeSortedBy('author');

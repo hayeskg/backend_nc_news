@@ -22,8 +22,8 @@ exports.patchArticleByArticleId = (req, res, next) => {
 
 exports.getCommentsByArticleId = (req, res, next) => {
   const { article_id } = req.params;
-  const { sorted_by, order } = req.query;
-  fetchCommentsByArticleId(article_id, sorted_by, order)
+  const { sort_by, order } = req.query;
+  fetchCommentsByArticleId(article_id, sort_by, order)
     .then(comments => {
       res.status(200).send({ comments });
     })
@@ -31,8 +31,8 @@ exports.getCommentsByArticleId = (req, res, next) => {
 }
 
 exports.getArticles = (req, res, next) => {
-  const { sorted_by, order, author, topic } = req.query;
-  fetchArticles(sorted_by, order, author, topic)
+  const { sort_by, order, author, topic } = req.query;
+  fetchArticles(sort_by, order, author, topic)
     .then(articles => {
       res.status(200).send({ articles });
     })
