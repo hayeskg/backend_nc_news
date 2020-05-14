@@ -6,6 +6,11 @@ const updateCommentById = (comment_id, vote) => {
     .where({ comment_id: comment_id })
     .increment({ votes: vote })
     .into('comments')
+    .catch(() => {
+      return knex('comments')
+        .select('*')
+        .where({ comment_id: comment_id });
+    })
     .then(updatedComments => {
       if (updatedComments.length === 0) {
         return Promise.reject({

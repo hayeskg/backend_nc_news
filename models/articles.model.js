@@ -23,11 +23,17 @@ const fetchArticleByArticleId = (article_id) => {
 }
 
 const updateArticleByArticleId = (article_id, vote) => {
+
   return knex
     .returning("*")
     .where({ article_id: article_id })
-    .increment({ votes: vote })
+    .increment({ votes: vote } || 0)
     .into('articles')
+    .catch(() => {
+      return knex('articles')
+        .select('*')
+        .where({ article_id: article_id });
+    })
     .then((article) => {
       if (article.length === 0) {
         return Promise.reject({
@@ -38,6 +44,7 @@ const updateArticleByArticleId = (article_id, vote) => {
         return article[0];
       }
     })
+
 }
 
 const fetchCommentsByArticleId = (article_id, sort_by, order) => {

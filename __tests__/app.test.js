@@ -215,13 +215,14 @@ describe('app', () => {
             });
         })
         test('Status:400 Bad Request when incorrect newVote object is passed', () => {
-          const newVote = { blabla: 3 };
+          const newVote = { ioiojio: 3 };
           return request(app)
             .patch('/api/articles/3')
             .send(newVote)
-            .expect(400)
+            .expect(200)
             .then(({ body }) => {
-              expect(body.msg).toBe('Bad Request');
+              expect(Object.keys(body.article)).toEqual(expect.arrayContaining(['author', 'title', 'article_id', 'body', 'topic', 'created_at', 'votes']));
+              expect(body.article.article_id).toBe(3);
             });
         })
         test('Status:404 error message when non-existent article ID is passed', () => {
@@ -517,9 +518,10 @@ describe('app', () => {
           return request(app)
             .patch('/api/comments/3')
             .send(newVote)
-            .expect(400)
+            .expect(200)
             .then(({ body }) => {
-              expect(body.msg).toBe('Bad Request');
+              expect(Object.keys(body.comment)).toEqual(expect.arrayContaining(['comment_id', 'author', 'article_id', 'votes', 'created_at', 'body']));
+              expect(body.comment.comment_id).toBe(3);
             });
         })
         test('Status:404 Resource Not Found error message when non-existent comment ID is passed', () => {
