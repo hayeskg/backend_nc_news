@@ -4,7 +4,7 @@ const updateCommentById = (comment_id, vote) => {
   return knex
     .returning("*")
     .where({ comment_id: comment_id })
-    .increment({ votes: vote })
+    .increment({ votes: vote } || 0)
     .into('comments')
     .catch(() => {
       return knex('comments')
