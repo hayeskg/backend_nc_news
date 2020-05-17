@@ -29,11 +29,11 @@ const updateArticleByArticleId = (article_id, vote) => {
     .where({ article_id: article_id })
     .increment({ votes: vote } || 0)
     .into('articles')
-    .catch(() => {
-      return knex('articles')
-        .select('*')
-        .where({ article_id: article_id });
-    })
+    // .catch(() => {
+    //   return knex('articles')
+    //     .select('*')
+    //     .where({ article_id: article_id });
+    // })
     .then((article) => {
       if (article.length === 0) {
         return Promise.reject({

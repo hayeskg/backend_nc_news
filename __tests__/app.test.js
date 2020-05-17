@@ -204,6 +204,18 @@ describe('app', () => {
               expect(body.article.votes).toEqual(120);
             });
         });
+        test('Status:200 returns unchanged article with incorrect newVotes object', () => {
+          const newVote = { inc_votes: 0 };
+          return request(app)
+            .patch('/api/articles/1')
+            .send(newVote)
+            .expect(200)
+            .then(({ body }) => {
+              expect(Object.keys(body.article)).toEqual(expect.arrayContaining(['author', 'title', 'article_id', 'body', 'topic', 'created_at', 'votes']));
+              expect(body.article.article_id).toBe(1);
+              expect(body.article.votes).toEqual(100);
+            });
+        });
         test('Status:400 Bad Request when invalid article ID is passed', () => {
           const newVote = { inc_votes: 20 };
           return request(app)
@@ -219,10 +231,9 @@ describe('app', () => {
           return request(app)
             .patch('/api/articles/3')
             .send(newVote)
-            .expect(200)
+            .expect(400)
             .then(({ body }) => {
-              expect(Object.keys(body.article)).toEqual(expect.arrayContaining(['author', 'title', 'article_id', 'body', 'topic', 'created_at', 'votes']));
-              expect(body.article.article_id).toBe(3);
+              expect(body.msg).toBe('Bad Request');
             });
         })
         test('Status:404 error message when non-existent article ID is passed', () => {
@@ -503,6 +514,17 @@ describe('app', () => {
               expect(body.comment.votes).toBe(80);
             });
         });
+        test('Status:200 No update to comment when no inc_votes key passed', () => {
+          const newVote = { inc_votes: 0 };
+          return request(app)
+            .patch('/api/comments/3')
+            .send(newVote)
+            .expect(200)
+            .then(({ body }) => {
+              expect(Object.keys(body.comment)).toEqual(expect.arrayContaining(['comment_id', 'author', 'article_id', 'votes', 'created_at', 'body']));
+              expect(body.comment.comment_id).toBe(3);
+            });
+        })
         test('Status:400 Bad Request when invalid comment ID is passed', () => {
           const newVote = { inc_votes: 20 };
           return request(app)
@@ -513,15 +535,15 @@ describe('app', () => {
               expect(body.msg).toBe('Bad Request');
             });
         })
-        test('Status:400 Bad Request when incorrect newVote object is passed', () => {
-          const newVote = { blabla: 3 };
+
+        test('Status:400 Bad Request when incorrect inc_votes value is passed', () => {
+          const newVote = { inc_votes: 'hello' };
           return request(app)
             .patch('/api/comments/3')
             .send(newVote)
-            .expect(200)
+            .expect(400)
             .then(({ body }) => {
-              expect(Object.keys(body.comment)).toEqual(expect.arrayContaining(['comment_id', 'author', 'article_id', 'votes', 'created_at', 'body']));
-              expect(body.comment.comment_id).toBe(3);
+              expect(body.msg).toBe('Bad Request');
             });
         })
         test('Status:404 Resource Not Found error message when non-existent comment ID is passed', () => {
