@@ -1,16 +1,14 @@
 const knex = require('../db/connection');
 
 const updateCommentById = (comment_id, vote) => {
+  if (typeof vote !== 'number') {
+    vote = 0;
+  }
   return knex
     .returning("*")
     .where({ comment_id: comment_id })
-    .increment({ votes: vote } || 0)
+    .increment({ votes: vote || 0 })
     .into('comments')
-    // .catch(() => {
-    //   return knex('comments')
-    //     .select('*')
-    //     .where({ comment_id: comment_id });
-    // })
     .then(updatedComments => {
       if (updatedComments.length === 0) {
         return Promise.reject({

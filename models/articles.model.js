@@ -22,18 +22,15 @@ const fetchArticleByArticleId = (article_id) => {
     })
 }
 
-const updateArticleByArticleId = (article_id, vote) => {
-
+const updateArticleByArticleId = (article_id, inc_votes) => {
+  if (typeof inc_votes !== 'number') {
+    inc_votes = 0;
+  }
   return knex
     .returning("*")
     .where({ article_id: article_id })
-    .increment({ votes: vote } || 0)
+    .increment({ votes: inc_votes || 0 })
     .into('articles')
-    // .catch(() => {
-    //   return knex('articles')
-    //     .select('*')
-    //     .where({ article_id: article_id });
-    // })
     .then((article) => {
       if (article.length === 0) {
         return Promise.reject({
