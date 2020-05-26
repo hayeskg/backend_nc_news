@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 const apiRouter = require('./routes/api.routes')
 const {
   handleCustomErrors,
@@ -8,6 +9,8 @@ const {
   handleMethodNotAllowed,
   send404,
 } = require('./errors/index.js');
+
+app.use(cors());
 
 
 app.use(express.json());
