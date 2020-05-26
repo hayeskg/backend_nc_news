@@ -42,7 +42,7 @@ npm test app
 ```
 This will initiate a Jest [https://jestjs.io/] test suite and provide feedback on individiual endpoints and methods - happy paths and edge cases.
 
-For database realted scripts, please see package.json file.
+For database related scripts, please see package.json file.
 
 
 ## Available API endpoints
