@@ -9,7 +9,7 @@ exports.fetchUser = (username) => {
       if (user.length === 0) {
         return Promise.reject({
           status: 404,
-          msg: `non-existent username: ${username}`,
+          msg: `Username: ${username} doesn't exist.`,
         });
       } else {
         return user[0];

@@ -82,7 +82,7 @@ const fetchArticles = (sort_by, order, author, topic) => {
       } else if ((topic) && results[1] === false) {
         return Promise.reject({
           status: 404,
-          msg: 'Bad Request - invalid query.',
+          msg: 'Resource not found.',
         });
       } else {
         return knex.select('articles.*')
